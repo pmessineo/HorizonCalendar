@@ -67,7 +67,9 @@ public struct CalendarViewRepresentable: UIViewRepresentable {
     }
     
     public func makeUIView(context: Context) -> CalendarView {
-        CalendarView(initialContent: makeContent())
+        let calendarView = CalendarView(initialContent: makeContent())
+        calendarView.scroll(toMonthContaining: Date(), scrollPosition: .centered, animated: false)
+        return calendarView
     }
     
     public func updateUIView(_ calendarView: CalendarView, context: Context) {
@@ -78,12 +80,6 @@ public struct CalendarViewRepresentable: UIViewRepresentable {
         calendarView.didEndDecelerating = didEndDecelerating
 
         calendarView.setContent(makeContent())
-
-        if !hasScrolledToInitialDate, let scrollToMonthAndDayHandler = scrollToMonthAndDayHandler {
-            calendarView.scroll(toMonthContaining: scrollToMonthAndDayHandler.date, scrollPosition: .centered,
-                                animated: scrollToMonthAndDayHandler.animated)
-            hasScrolledToInitialDate = true
-        }
     }
     
     // MARK: Fileprivate
@@ -123,8 +119,6 @@ public struct CalendarViewRepresentable: UIViewRepresentable {
     private let visibleDateRange: ClosedRange<Date>
     private let monthsLayout: MonthsLayout
     private let dataDependency: Any?
-    
-    @State private var hasScrolledToInitialDate = false
     
     private func makeContent() -> CalendarViewContent {
         var content = CalendarViewContent(
